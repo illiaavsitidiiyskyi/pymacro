@@ -19,7 +19,8 @@ dev = [
     "ruff>=0.6",
 ]
 
-# [project.scripts] — add once macroflow.__main__:main exists
+[project.scripts]
+macroflow = "macroflow.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

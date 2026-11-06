@@ -1,1 +1,1 @@
-# save/load JSON
+"""Save/load macros as JSON."""

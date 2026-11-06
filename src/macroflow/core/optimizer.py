@@ -1,1 +1,1 @@
-# replaces delays with min delay
+"""Delay optimization: replace delays with min delay."""

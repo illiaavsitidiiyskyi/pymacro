@@ -1,1 +1,1 @@
-# keyboard recording
+"""Keyboard recording."""

@@ -1,1 +1,1 @@
-# playback
+"""Playback of recorded macros."""

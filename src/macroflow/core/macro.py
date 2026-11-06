@@ -1,1 +1,1 @@
-# Macro model (list of events)
+"""Macro model (list of events)."""

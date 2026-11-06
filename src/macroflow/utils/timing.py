@@ -1,1 +1,1 @@
-# precise sleep (high-res timer)
+"""Precise sleep (high-resolution timer)."""

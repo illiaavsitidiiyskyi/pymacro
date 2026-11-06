@@ -1,1 +1,1 @@
-# main window (optional, later)
+"""Main window (optional, later)."""

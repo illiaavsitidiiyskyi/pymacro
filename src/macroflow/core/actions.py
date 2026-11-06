@@ -1,1 +1,1 @@
-# KeyDown / KeyUp events
+"""KeyDown / KeyUp events."""

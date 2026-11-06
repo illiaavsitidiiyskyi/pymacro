@@ -1,1 +1,1 @@
-# system tray (optional, later)
+"""System tray (optional, later)."""

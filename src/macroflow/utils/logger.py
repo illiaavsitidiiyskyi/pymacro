@@ -1,1 +1,1 @@
-# logging setup
+"""Logging setup."""

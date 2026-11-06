@@ -1,1 +1,1 @@
-# hotkeys, min delay value
+"""Configuration: hotkeys, min delay value."""
