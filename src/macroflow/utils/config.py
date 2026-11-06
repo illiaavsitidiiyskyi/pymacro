@@ -1,0 +1,1 @@
+# hotkeys, min delay value
