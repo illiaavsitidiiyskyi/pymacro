@@ -21,11 +21,11 @@ from __future__ import annotations
 import logging
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from macroflow.core.actions import KeyLike, key_down, key_up
+from macroflow.core.actions import KeyLike, key_down, key_name, key_up
 from macroflow.core.macro import Macro
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -78,6 +78,8 @@ class Recorder:
         clock: Time source, injectable for tests (defaults to ``time.time``).
         listener_factory: Replacement for the pynput listener constructor,
             used by tests to drive :meth:`_on_press` / :meth:`_on_release`.
+        ignore_keys: Keys never recorded, as key names (``"f9"``) or single
+            characters — typically the toggle hotkey.
         join_timeout: Seconds :meth:`stop` waits for the listener thread to
             exit before giving up on it (see the module note on X11).
     """
@@ -88,6 +90,7 @@ class Recorder:
         *,
         clock: Callable[[], float] = time.time,
         listener_factory: ListenerFactory | None = None,
+        ignore_keys: Iterable[KeyLike] = (),
         join_timeout: float = 0.5,
     ) -> None:
         self.macro = macro if macro is not None else Macro()
@@ -96,6 +99,7 @@ class Recorder:
         self._listener: Listener | None = None
         self._lock = threading.Lock()
         self._last_time: float | None = None
+        self.ignore_keys: set[str] = {key_name(key) for key in ignore_keys}
         self.join_timeout = join_timeout
 
     # -- state --------------------------------------------------------------
@@ -104,8 +108,19 @@ class Recorder:
         """True while the listener is capturing keys."""
         return self._listener is not None
 
+    def ignore(self, *keys: KeyLike) -> None:
+        """Never record ``keys`` (given as key members, characters or names).
+
+        Used by :class:`~macroflow.core.hotkeys.Hotkeys` so that the toggle
+        hotkey itself stays out of the recorded macro.
+        """
+        self.ignore_keys.update(key_name(key) for key in keys)
+
     def start(self) -> None:
         """Start recording (creates the listener on first call).
+
+        Returns once the listener is actually receiving events, so no key
+        pressed right after this call can be missed.
 
         Raises:
             RuntimeError: if recording is already in progress.
@@ -119,6 +134,7 @@ class Recorder:
         self._listener = listener
         try:
             listener.start()
+            listener.wait()
         except BaseException:
             self._listener = None
             with self._lock:
@@ -174,6 +190,8 @@ class Recorder:
         keylike = to_keylike(key)
         if keylike is None:
             return  # not replayable (e.g. a KeyCode without a character)
+        if key_name(keylike) in self.ignore_keys:
+            return  # the toggle hotkey, or another key we must not record
         with self._lock:
             last = self._last_time
             if last is None:

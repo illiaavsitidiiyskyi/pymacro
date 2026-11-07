@@ -46,6 +46,9 @@ class FakeListener:
     def start(self):
         self.started = True
 
+    def wait(self):
+        self.waited = True
+
     def stop(self):
         self.stopped = True
 
@@ -79,6 +82,7 @@ def test_start_and_stop_lifecycle():
     assert recorder.is_running
     assert len(listeners) == 1
     assert listeners[0].started
+    assert listeners[0].waited  # start() only returns once we can capture keys
 
     macro = recorder.stop()
     assert not recorder.is_running
@@ -146,6 +150,24 @@ def test_records_into_a_given_macro():
     assert recorder.macro is macro
     assert macro.name == "existing"
     assert len(macro) == 2
+
+
+def test_ignored_keys_are_never_recorded():
+    recorder, _clock, listeners = make_recorder(ignore_keys=[FakeKey.enter, "q"])
+    recorder.ignore("z")  # both the constructor and ignore() work
+    recorder.start()
+
+    listeners[0].on_press(FakeKey.enter)
+    listeners[0].on_release(FakeKey.enter)
+    listeners[0].on_press("q")
+    listeners[0].on_release("q")
+    listeners[0].on_press("z")
+    listeners[0].on_release("z")
+    listeners[0].on_press("a")
+    listeners[0].on_release("a")
+
+    assert [event.key for event in recorder.macro] == ["a", "a"]
+    assert recorder.ignore_keys == {"enter", "q", "z"}
 
 
 def test_start_twice_raises_and_stop_when_idle_raises():
