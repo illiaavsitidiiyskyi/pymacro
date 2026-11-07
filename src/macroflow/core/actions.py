@@ -67,10 +67,13 @@ class KeyEvent:
         key: The key affected by the event.
         delay: Seconds to wait *before* the event fires (time since the
             previous event), as recorded by the recorder.  ``0.0`` by default.
+        timestamp: Wall-clock time (``time.time()``) when the event was
+            recorded, or ``None`` for hand-built events.
     """
 
     key: KeyLike
     delay: float = 0.0
+    timestamp: float | None = None
 
     def __str__(self) -> str:
         return f"{type(self).__name__}({key_name(self.key)}, delay={self.delay:.3f})"
@@ -98,14 +101,14 @@ class KeyUp(KeyEvent):
         target.release(normalize_key(self.key))
 
 
-def key_down(key: KeyLike, delay: float = 0.0) -> KeyDown:
+def key_down(key: KeyLike, delay: float = 0.0, timestamp: float | None = None) -> KeyDown:
     """Convenience factory for :class:`KeyDown`."""
-    return KeyDown(key=normalize_key(key), delay=delay)
+    return KeyDown(key=normalize_key(key), delay=delay, timestamp=timestamp)
 
 
-def key_up(key: KeyLike, delay: float = 0.0) -> KeyUp:
+def key_up(key: KeyLike, delay: float = 0.0, timestamp: float | None = None) -> KeyUp:
     """Convenience factory for :class:`KeyUp`."""
-    return KeyUp(key=normalize_key(key), delay=delay)
+    return KeyUp(key=normalize_key(key), delay=delay, timestamp=timestamp)
 
 
 __all__ = [
