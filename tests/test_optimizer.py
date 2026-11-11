@@ -8,6 +8,7 @@ import pytest
 from macroflow.core.actions import KeyDown, key_down, key_up
 from macroflow.core.macro import Macro
 from macroflow.core.optimizer import DEFAULT_MIN_DELAY, optimize
+from macroflow.utils.config import DEFAULT_MIN_DELAY as CONFIG_DEFAULT_MIN_DELAY
 
 
 def build_macro() -> Macro:
@@ -29,6 +30,10 @@ def test_all_delays_are_overwritten_with_the_default():
 
     assert [event.delay for event in optimized] == [DEFAULT_MIN_DELAY] * 3
     assert optimized.duration == pytest.approx(3 * DEFAULT_MIN_DELAY)
+
+
+def test_default_comes_from_config():
+    assert DEFAULT_MIN_DELAY == CONFIG_DEFAULT_MIN_DELAY == pytest.approx(0.002)
 
 
 def test_all_delays_are_overwritten_with_a_custom_value():

@@ -17,9 +17,8 @@ from dataclasses import replace
 
 from macroflow.core.macro import Macro
 
-#: Default minimum delay, in seconds (10 ms).  Raise it if the target
-#: application drops keys that arrive this fast.
-DEFAULT_MIN_DELAY = 0.01
+# Re-exported for backwards compatibility: the knob itself lives in config.
+from macroflow.utils.config import DEFAULT_MIN_DELAY
 
 __all__ = ["DEFAULT_MIN_DELAY", "optimize"]
 
@@ -51,7 +50,7 @@ def optimize(macro: Macro, min_delay: float = DEFAULT_MIN_DELAY, *, inplace: boo
     Args:
         macro: The macro whose delays should be rewritten.
         min_delay: Seconds to write into every event.  Defaults to
-            :data:`DEFAULT_MIN_DELAY`.
+            :data:`macroflow.utils.config.DEFAULT_MIN_DELAY` (2 ms).
         inplace: When ``True`` rewrite ``macro`` itself and return it; when
             ``False`` (the default) leave ``macro`` untouched and return a
             copy.
